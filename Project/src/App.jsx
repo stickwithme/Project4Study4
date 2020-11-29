@@ -1,20 +1,26 @@
 import React from "react";
-import { Profile } from "./Profile";
-import { Home } from "./Home";
-import { About } from "./About";
+import { ProfileWithAuth } from "./Profile";
+import { HomeWithAuth } from "./Home";
+import { Map } from "./Map";
+import { withAuth } from "./AuthContext";
+import PropTypes from 'prop-types';
 import "./App.css";
 
 const PAGES = {
-  home: <Home />,
-  about: <About />,
-  profile: <Profile />,
+  home: (props) => <HomeWithAuth {...props} />,
+  map: (props) => <Map {...props} />,
+  profile: (props) => <ProfileWithAuth {...props} />,
 };
 
 class App extends React.Component {
   state = { currentPage: "home" };
 
   navigateTo = (page) => {
-    this.setState({ currentPage: page });
+    if (this.props.isLoggedIn) {
+      this.setState({ currentPage: page });
+    } else {
+      this.setState({ currentPage: "home" });
+    }
   };
 
   render() {
@@ -24,41 +30,47 @@ class App extends React.Component {
           <nav>
             <ul>
               <li>
-                <a
+                <button
                   onClick={() => {
                     this.navigateTo("home");
                   }}
                 >
                   Home
-                </a>
+                </button>
               </li>
               <li>
-                <a
+                <button
                   onClick={() => {
-                    this.navigateTo("about");
+                    this.navigateTo("map");
                   }}
                 >
-                  About
-                </a>
+                  Map
+                </button>
               </li>
               <li>
-                <a
+                <button
                   onClick={() => {
                     this.navigateTo("profile");
                   }}
                 >
                   Profile
-                </a>
+                </button>
               </li>
             </ul>
           </nav>
         </header>
         <main data-testid="container">
-          <section>{PAGES[this.state.currentPage]}</section>
+          <section>
+            {PAGES[this.state.currentPage]({ navigate: this.navigateTo })}
+          </section>
         </main>
       </>
     );
   }
 }
 
-export default App;
+App.propTypes = {
+  isLoggedIn: PropTypes.bool
+};
+
+export default withAuth(App);
