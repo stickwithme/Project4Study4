@@ -7,7 +7,17 @@ import { connect } from "react-redux";
 import { Switch, Route, Link } from "react-router-dom";
 import { PrivateRoute } from "./PrivateRoute";
 
-export class App extends React.Component {
+class App extends React.Component {
+  state = { currentPage: "map" };
+
+  navigateTo = (page) => {
+    if (this.props.isLoggedIn) {
+      this.setState({ currentPage: page });
+    } else {
+      this.setState({ currentPage: "home" });
+    }
+  };
+
   render() {
     return (
       <>
